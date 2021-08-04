@@ -24,6 +24,8 @@ namespace DrMathDesktop.ResultForms
             InitializeComponent();
             context = new AppDbContext();
             PopulateTrainerCombobox();
+            PopulateLevelCombobox();
+            PopulateAgeRangeCombobox();
             LoadData();
         }
 
@@ -31,7 +33,7 @@ namespace DrMathDesktop.ResultForms
         {
             var items = context.Results
                   .Include(x => x.Student)
-                  .OrderByDescending(x=>x.ResultValue)
+                  .OrderByDescending(x => x.ResultValue)
                 .AsNoTracking().ToList();
             dgv.DataSource = DataTablesFactory.ResultsDataTable(items);
         }
@@ -110,6 +112,11 @@ namespace DrMathDesktop.ResultForms
             DisableEditDeleteButtons();
         }
 
+        private void btnShowAll_Click(object sender, EventArgs e)
+        {
+            LoadData();
+        }
+
         private void btnSearch_Click(object sender, EventArgs e)
         {
             var searchText = txtSearch.Text;
@@ -130,7 +137,15 @@ namespace DrMathDesktop.ResultForms
             if (Convert.ToInt32(cmbTrainerName.SelectedValue) > 0)
             {
                 var trainerId = Convert.ToInt32(cmbTrainerName.SelectedValue);
-                items = items.Where(x => x.Student.TrainerId == trainerId);
+                items = items.Where(x => x.Student.TrainerId == trainerId
+                                      && x.Student.AgeRange == (EnumAgeRange)cmbAgeRange.SelectedValue
+                                      && x.Student.Level == (EnumStudentLevel)cmbLevel.SelectedValue);
+            }
+
+            if (!string.IsNullOrEmpty(txtResultFrom.Text) && !string.IsNullOrEmpty(txtResultTo.Text))
+            {
+                items = items.Where(x => x.ResultValue >= Convert.ToDecimal(txtResultFrom.Text)
+                                      && x.ResultValue <= Convert.ToDecimal(txtResultTo.Text));
             }
             dgv.DataSource = DataTablesFactory.ResultsDataTable(items.AsNoTracking().ToList());
         }
@@ -160,7 +175,17 @@ namespace DrMathDesktop.ResultForms
             cmbTrainerName.ValueMember = "Value";
         }
 
-       
+        private void PopulateLevelCombobox()
+        {
+            cmbLevel.DataSource = Enum.GetValues(typeof(EnumStudentLevel));
+        }
+        private void PopulateAgeRangeCombobox()
+        {
+            cmbAgeRange.DisplayMember = CombBoxFactory.Description;
+            cmbAgeRange.ValueMember = CombBoxFactory.Value;
+            cmbAgeRange.DataSource = CombBoxFactory.AgeRangeCombBox();
+        }
+
 
         private void txtSearch_TextChanged(object sender, EventArgs e)
         {
@@ -170,5 +195,12 @@ namespace DrMathDesktop.ResultForms
                 cmbTrainerName.SelectedIndex = 0;
             }
         }
+
+        private void ResultRangeKeyPress(object sender, KeyPressEventArgs e)
+        {
+            InputEventsHandler.TexboxNumericOnly(sender, e);
+        }
+
+      
     }
 }
