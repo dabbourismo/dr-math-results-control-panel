@@ -1,5 +1,6 @@
 ﻿using DrMathDesktop.Database;
 using DrMathDesktop.Models;
+using DrMathDesktop.Reports;
 using DrMathDesktop.ResultForms;
 using DrMathDesktop.StudentForms;
 using DrMathDesktop.TrainerForms;
@@ -87,6 +88,28 @@ namespace DrMathDesktop
                 panel3.Top = button3.Top;
                 this.Text = "النتائج";
                 var form = new ResultList();
+                groupBox1.Controls.Clear();
+                form.TopLevel = false;
+                groupBox1.Controls.Add(form);
+                form.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+                form.Dock = DockStyle.Fill;
+                form.Show();
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            var trainers = context.Students.Count();
+            if (trainers == 0)
+            {
+                MessageBox.Show("فضلا قم بادخال طلاب اولا");
+            }
+            else
+            {
+                panel3.Height = button4.Height;
+                panel3.Top = button4.Top;
+                this.Text = "التقارير";
+                var form = new ReportParameters();
                 groupBox1.Controls.Clear();
                 form.TopLevel = false;
                 groupBox1.Controls.Add(form);

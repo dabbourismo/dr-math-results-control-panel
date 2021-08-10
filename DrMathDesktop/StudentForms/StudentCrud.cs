@@ -56,7 +56,8 @@ namespace DrMathDesktop.StudentForms
 
         private  void Insert()
         {
-            var trainer =  context.Trainers.AsNoTracking().FirstOrDefault(x=>x.Id == Convert.ToInt32(cmbTrainerName.SelectedValue));
+            var id = Convert.ToInt32(cmbTrainerName.SelectedValue);
+            var trainer =  context.Trainers.AsNoTracking().FirstOrDefault(x=>x.Id == id);
             if (trainer == null)
             {
                 MessageBox.Show("هذا المدرب غير موجود ، تاكد من اختيار المدرب بشكل صحيح من القائمة");
